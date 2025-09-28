@@ -5,5 +5,7 @@ public class Task017 {
         //Person myObj =new Person();
        // myObj.name = "John";
        // System.out.println(myObj.name);
+        
     }
 }
+
