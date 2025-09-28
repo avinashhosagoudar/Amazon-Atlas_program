@@ -8,6 +8,7 @@ public class Task002 {
         y++;
         System.out.println(x);
         System.out.println(y);
+        
 
 
     }
@@ -17,3 +18,4 @@ public class Task002 {
         add();
     }
 }
+
