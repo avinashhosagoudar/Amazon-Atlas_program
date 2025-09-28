@@ -2,6 +2,7 @@ package DAY07;
 
 class Task014 {
     public static void main(String[] args) {
+        
         char[] arr = {'a','e','i','o','u'};
         System.out.println(arr);
         String[] names = {"Meena", "Tina", "Veena", "heena"};
@@ -15,4 +16,5 @@ class Task014 {
 
 
     }
+
 }
