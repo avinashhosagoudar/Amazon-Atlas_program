@@ -12,7 +12,9 @@ public class Task007 {
 
         System.out.println("your login id \t" + id + "and password\t" + pass);
         sc.close();
+        
     }
 
 
 }
+
