@@ -4,6 +4,7 @@ package DAY07;
 public class Task20 {
     public static void main(String[]args){
         char [] names = {'A','V','I','N','S','H'};
+        
 
 
         System.out.println(names.length);
@@ -32,4 +33,5 @@ public class Task20 {
     }
 
 }
+
 
