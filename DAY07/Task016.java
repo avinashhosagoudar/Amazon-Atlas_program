@@ -3,6 +3,7 @@ package DAY07;
 import  java.util.HashMap;
 import  java.util.Map;
 public class Task016 {
+    
 
     public enum Element {
         H("Hydrogen", 1, 1.008f),
@@ -45,4 +46,5 @@ public class Task016 {
         }
 
     }
+
 }
