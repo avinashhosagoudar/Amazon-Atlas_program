@@ -2,6 +2,7 @@ package DAY07;
 
 public class Task008 {
     public static void main(String[] args) {
+        
         Customer obj = new Customer();
         obj.display();
         obj.accept();
@@ -20,3 +21,4 @@ public class Task008 {
         }
     }
 }
+
