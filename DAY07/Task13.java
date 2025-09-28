@@ -7,6 +7,8 @@ public class Task13 {
                 continue;
             }
             System.out.println(i);
+            
         }
     }
 }
+
