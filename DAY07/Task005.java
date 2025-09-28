@@ -13,6 +13,7 @@ public class Task005 {
     static double div(int x,int y){
         return x/y;
     }
+    
 
     public static void main(String[]args){
         System.out.println("addition="+ add(5,10));
@@ -22,3 +23,4 @@ public class Task005 {
 
     }
 }
+
