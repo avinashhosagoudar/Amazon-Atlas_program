@@ -1,5 +1,6 @@
 package DAY07;
 
+
 import java.util.Scanner;
 class Task012 {
     public static void main(String[] args) {
@@ -24,3 +25,4 @@ class Task012 {
 
     }
 }
+
