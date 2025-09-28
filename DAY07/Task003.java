@@ -5,8 +5,10 @@ public class Task003 {
         return x + y;
 
     }
+    
     public static  void main(String[]args){
         int res = add(2,5);
         System.out.println(res);
     }
 }
+
