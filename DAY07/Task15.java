@@ -9,7 +9,9 @@ class Task015 {
         char ch[] = {'S', 't', 'r' ,'i', 'n', 'g'};
         String str4 = new String(ch);
         System.out.println(str1 + "\n" + str2 + "\n" +str3 + "\n" +str4);
+        
 
 
     }
+
 }
