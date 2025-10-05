@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    
+    <!-- 
+        Copy this file to:
+        Windows: %USERPROFILE%\.m2\settings.xml
+        Linux/Mac: ~/.m2/settings.xml
+    -->
+    
+    <mirrors>
+        <!-- Block insecure HTTP repositories -->
+        <mirror>
+            <id>maven-default-http-blocker</id>
+            <mirrorOf>external:http:*</mirrorOf>
+            <name>Block HTTP repositories</name>
+            <url>http://0.0.0.0/</url>
+            <blocked>true</blocked>
+        </mirror>
+        
+        <!-- Google's mirror of Maven Central (faster and more reliable) -->
+        <mirror>
+            <id>google-maven-central</id>
+            <name>Google Maven Central Mirror</name>
+            <url>https://maven-central.storage-download.googleapis.com/maven2/</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        
+        <!-- Alternative: Aliyun Mirror (good for Asia) -->
+        <!--
+        <mirror>
+            <id>alimaven</id>
+            <name>Aliyun Maven</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        -->
+        
+        <!-- Alternative: UK Mirror -->
+        <!--
+        <mirror>
+            <id>uk</id>
+            <name>UK Central</name>
+            <url>https://uk.maven.org/maven2</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+        -->
+    </mirrors>
+    
+    <!-- Proxy configuration (uncomment if needed) -->
+    <!--
+    <proxies>
+        <proxy>
+            <id>corporate-proxy</id>
+            <active>true</active>
+            <protocol>http</protocol>
+            <host>proxy.company.com</host>
+            <port>8080</port>
+            <username>proxyuser</username>
+            <password>proxypass</password>
+            <nonProxyHosts>localhost|127.0.0.1</nonProxyHosts>
+        </proxy>
+    </proxies>
+    -->
+    
+    <!-- Local repository location (optional) -->
+    <!--
+    <localRepository>D:/maven-repo</localRepository>
+    -->
+    
+    <profiles>
+        <profile>
+            <id>banking-system</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+    
+    <activeProfiles>
+        <activeProfile>banking-system</activeProfile>
+    </activeProfiles>
+</settings>

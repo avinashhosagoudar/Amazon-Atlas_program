@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undo/Redo Transactions</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Undo/Redo Transactions</h1>
+            <button class="back-btn" onclick="location.href='customer-dashboard.html'">← Back to Dashboard</button>
+        </div>
+
+        <div class="content">
+            <div class="info-message">
+                <strong>ℹ️ Information:</strong> Select an account to undo/redo transactions for that specific account. Or use the general buttons to undo/redo the last transaction across all accounts.
+            </div>
+
+            <!-- Account Selection -->
+            <div class="form-container" style="margin-bottom: 20px;">
+                <h3>Select Account</h3>
+                <div id="accountsList" class="accounts-list" style="margin-bottom: 20px;"></div>
+                <div id="selectedAccountInfo" style="padding: 15px; background: #f0f0f0; border-radius: 8px; margin-bottom: 20px; display: none;">
+                    <strong>Selected Account:</strong> <span id="selectedAccountNumber"></span> 
+                    (<span id="selectedAccountType"></span>)
+                </div>
+            </div>
+
+            <div class="form-container">
+                <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+                    <button id="undoBtn" class="submit-btn" onclick="handleUndo()" style="flex: 1; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        ↶ Undo Last Transaction
+                    </button>
+                    <button id="redoBtn" class="submit-btn" onclick="handleRedo()" style="flex: 1; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        ↷ Redo Last Transaction
+                    </button>
+                </div>
+
+                <div id="historySummary" class="balance-details"></div>
+            </div>
+
+            <div class="transaction-history">
+                <h3>Undoable Transactions</h3>
+                <div id="undoableList"></div>
+            </div>
+
+            <div class="transaction-history">
+                <h3>Redoable Transactions</h3>
+                <div id="redoableList"></div>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/undo-redo.js"></script>
+</body>
+</html>

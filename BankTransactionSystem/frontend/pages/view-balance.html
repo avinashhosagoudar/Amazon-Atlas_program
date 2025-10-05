@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Balance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .click-hint {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+        
+        .password-prompt {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px solid #4CAF50;
+        }
+        
+        .password-prompt h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .password-prompt p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+        
+        .balance-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .balance-display h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .balance-info {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .balance-info p {
+            margin: 12px 0;
+            font-size: 1.1em;
+        }
+        
+        .balance-highlight {
+            font-size: 1.3em !important;
+            margin-top: 20px !important;
+            padding-top: 15px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .balance-amount {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffeb3b;
+            display: block;
+            margin-top: 10px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .balance-display .btn-secondary {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .balance-display .btn-secondary:hover {
+            background: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>View Balance</h1>
+            <button class="back-btn" onclick="location.href='customer-dashboard.html'">← Back to Dashboard</button>
+        </div>
+
+        <div class="content">
+            <div id="accountsList" class="accounts-list"></div>
+            <div id="balanceDetails" class="balance-details"></div>
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/balance.js"></script>
+</body>
+</html>

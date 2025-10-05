@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking System - Home</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Automated Banking System</h1>
+            <p>Secure, Fast, and Reliable Banking Services</p>
+        </div>
+
+        <div class="main-menu">
+            <h2>Main Menu</h2>
+            <div class="menu-options">
+                <button class="menu-btn" onclick="location.href='pages/register.html'">
+                    <span class="btn-number">1</span>
+                    <span class="btn-text">Customer Register</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='pages/login.html'">
+                    <span class="btn-number">2</span>
+                    <span class="btn-text">Customer Login</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='pages/employee-login.html'">
+                    <span class="btn-number">3</span>
+                    <span class="btn-text">Employee Login</span>
+                </button>
+                <button class="menu-btn exit-btn" onclick="exitApp()">
+                    <span class="btn-number">4</span>
+                    <span class="btn-text">Exit</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Banking System. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

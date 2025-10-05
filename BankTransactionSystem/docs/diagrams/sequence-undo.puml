@@ -1,0 +1,114 @@
+@startuml Undo Transaction - Sequence Diagram
+
+title Undo Transaction Flow (Command Pattern)
+
+actor User
+participant "Browser" as Browser
+participant "TransactionHistoryController" as Controller
+participant "TransactionService" as Service
+participant "TransactionHistory" as History
+participant "AccountService" as AcctService
+participant "AuditLogService" as Audit
+participant "MongoDB" as DB
+
+User -> Browser : Click Undo Last Transaction
+Browser -> Controller : POST /api/transaction-history/undo
+
+activate Controller
+Controller -> Service : undoLastTransaction()
+
+activate Service
+Service -> History : popFromUndoStack()
+activate History
+
+alt No Transaction to Undo
+    History --> Service : null
+    Service --> Controller : throw IllegalStateException\n("No transaction to undo")
+    Controller --> Browser : 400 Bad Request
+    Browser --> User : No transaction available
+else Transaction Available
+    History -> History : Remove last transaction from undo stack
+    History -> History : Add transaction to redo stack
+    History --> Service : Transaction to undo
+    deactivate History
+    
+    Service -> Service : Identify transaction type
+    
+    alt Transaction Type: DEPOSIT
+        Service -> Service : reverseDeposit(transaction)
+        activate Service
+        Service -> AcctService : getAccountByNumber(toAccountNumber)
+        activate AcctService
+        AcctService -> DB : findByAccountNumber()
+        DB --> AcctService : Account
+        AcctService --> Service : Account
+        deactivate AcctService
+        
+        Service -> Service : Calculate: newBalance = balance - amount
+        Service -> Service : Check: newBalance >= 0
+        
+        Service -> AcctService : updateBalance(accountNumber, newBalance)
+        activate AcctService
+        AcctService -> DB : save(account)
+        DB --> AcctService : Updated account
+        AcctService --> Service : Updated account
+        deactivate AcctService
+        
+        Service -> Service : Create reverse transaction\n(type: DEPOSIT_REVERSAL)
+        Service -> DB : save(reverseTransaction)
+        deactivate Service
+        
+    else Transaction Type: WITHDRAW
+        Service -> Service : reverseWithdrawal(transaction)
+        activate Service
+        Service -> AcctService : getAccountByNumber(fromAccountNumber)
+        AcctService --> Service : Account
+        
+        Service -> Service : Calculate: newBalance = balance + amount
+        Service -> AcctService : updateBalance(accountNumber, newBalance)
+        AcctService --> Service : Updated account
+        
+        Service -> Service : Create reverse transaction\n(type: WITHDRAW_REVERSAL)
+        Service -> DB : save(reverseTransaction)
+        deactivate Service
+        
+    else Transaction Type: TRANSFER
+        Service -> Service : reverseTransfer(transaction)
+        activate Service
+        Service -> AcctService : getAccountByNumber(fromAccountNumber)
+        AcctService --> Service : From Account
+        Service -> AcctService : getAccountByNumber(toAccountNumber)
+        AcctService --> Service : To Account
+        
+        Service -> Service : Transfer amount back:\nfrom 'to account' to 'from account'
+        
+        Service -> AcctService : updateBalance(toAccount, balance - amount)
+        AcctService --> Service : Updated to account
+        
+        Service -> AcctService : updateBalance(fromAccount, balance + amount)
+        AcctService --> Service : Updated from account
+        
+        Service -> Service : Create reverse transaction\n(type: TRANSFER_REVERSAL)
+        Service -> DB : save(reverseTransaction)
+        deactivate Service
+    end
+    
+    ' Audit logging
+    Service -> Audit : logAction(TRANSACTION_UNDO, TRANSACTION,\ntransactionId)
+    
+    Service --> Controller : true (success)
+    deactivate Service
+    
+    Controller --> Browser : 200 OK {success: true, message}
+    Browser --> User : Transaction undone successfully
+end
+
+note right of History
+  Command Pattern Implementation:
+  - Undo Stack: Stores executed transactions
+  - Redo Stack: Stores undone transactions
+  - Each transaction can be reversed
+  - Redo clears when new transaction occurs
+end note
+
+@enduml

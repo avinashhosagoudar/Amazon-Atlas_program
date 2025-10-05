@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Audit Logs</h1>
+            <button class="back-btn" onclick="location.href='customer-dashboard.html'">← Back to Dashboard</button>
+        </div>
+
+        <div class="content">
+            <div class="info-message">
+                <strong>ℹ️ Information:</strong> View all your account activities and security events.
+            </div>
+
+            <div class="form-container" style="max-width: 100%;">
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="submit-btn" onclick="loadAllLogs()" style="flex: 1; min-width: 150px;">
+                        📄 All Logs
+                    </button>
+                    <button class="submit-btn" onclick="loadTransactionLogs()" style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        💰 Transaction Logs
+                    </button>
+                    <button class="submit-btn" onclick="loadSecurityLogs()" style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        🔒 Security Logs
+                    </button>
+                    <button class="submit-btn" onclick="loadRecentLogs()" style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        ⏱️ Recent (24h)
+                    </button>
+                </div>
+
+                <div id="logsSummary" class="balance-details"></div>
+            </div>
+
+            <div class="transaction-history">
+                <h3 id="logsTitle">Audit Logs</h3>
+                <div id="logsTable"></div>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/audit-logs.js"></script>
+</body>
+</html>

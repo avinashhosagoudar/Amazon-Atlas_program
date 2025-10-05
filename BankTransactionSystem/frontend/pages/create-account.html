@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Create Account</h1>
+            <button class="back-btn" onclick="location.href='customer-dashboard.html'">← Back to Dashboard</button>
+        </div>
+
+        <div class="form-container">
+            <div class="info-message" style="background-color: #e3f2fd; border-left: 4px solid #2196F3; padding: 12px; margin-bottom: 20px;">
+                <strong>ℹ️ Account Restrictions:</strong>
+                <ul style="margin: 8px 0 0 20px; font-size: 14px;">
+                    <li>Each customer can have only ONE Savings Bank (SB) account</li>
+                    <li>Each customer can have only ONE Current Account (CA)</li>
+                    <li>SB Minimum balance: INR 1,000</li>
+                    <li>CA Minimum balance: INR 5,000</li>
+                </ul>
+            </div>
+            
+            <div id="existingAccounts" class="existing-accounts" style="margin-bottom: 20px;"></div>
+            
+            <form id="createAccountForm" onsubmit="handleCreateAccount(event)">
+                <div class="form-group">
+                    <label for="accountType">Enter type of the account:</label>
+                    <select id="accountType" name="accountType" required>
+                        <option value="">-- Select Account Type --</option>
+                        <option value="SB">SB (Savings Bank)</option>
+                        <option value="CA">CA (Current Account)</option>
+                    </select>
+                    <small>SB: Minimum balance 1000 | CA: Minimum balance 5000</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="initialDeposit">Enter initial Deposit:</label>
+                    <input type="number" id="initialDeposit" name="initialDeposit" 
+                           required min="1000" step="0.01" placeholder="10000.00">
+                    <small>Minimum: INR 1000 for SB, INR 5000 for CA</small>
+                </div>
+
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/account.js"></script>
+</body>
+</html>

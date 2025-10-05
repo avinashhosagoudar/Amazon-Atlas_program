@@ -1,0 +1,78 @@
+@startuml Deposit Money - Sequence Diagram
+
+title Deposit Money Transaction Flow
+
+actor User
+participant "Browser" as Browser
+participant "TransactionController" as Controller
+participant "TransactionService" as Service
+participant "AccountService" as AcctService
+participant "TransactionQueue" as Queue
+participant "TransactionStack" as Stack
+participant "TransactionHistory" as History
+participant "AuditLogService" as Audit
+participant "MongoDB" as DB
+
+User -> Browser : Enter deposit amount
+Browser -> Controller : POST /api/transactions/deposit\n{accountNumber, amount}
+
+activate Controller
+Controller -> Service : depositMoney(accountNumber, amount)
+
+activate Service
+Service -> Service : Validate amount > 0
+
+Service -> AcctService : getAccountByNumber(accountNumber)
+activate AcctService
+AcctService -> DB : findByAccountNumber()
+DB --> AcctService : Account details
+AcctService --> Service : Account
+deactivate AcctService
+
+Service -> Service : validateTransactionLimits()\n(Check min/max/daily limits)
+
+alt Validation Fails
+    Service --> Controller : throw IllegalArgumentException
+    Controller --> Browser : 400 Bad Request
+    Browser --> User : Error message
+else Validation Succeeds
+    Service -> Service : Create Transaction object\n(status: PENDING)
+    
+    Service -> Queue : enqueue(transaction)
+    activate Queue
+    Queue --> Service : true
+    deactivate Queue
+    
+    Service -> AcctService : updateBalance(accountNumber, newBalance)
+    activate AcctService
+    AcctService -> DB : save(account)
+    DB --> AcctService : Updated account
+    AcctService -> Audit : logAction(BALANCE_UPDATE)
+    AcctService --> Service : Updated account
+    deactivate AcctService
+    
+    Service -> Service : Update transaction status: SUCCESS
+    Service -> DB : save(transaction)
+    DB --> Service : Saved transaction
+    
+    Service -> Stack : push(transaction)
+    activate Stack
+    Stack --> Service : true
+    deactivate Stack
+    
+    Service -> History : pushToUndoStack(transaction)
+    activate History
+    History -> History : Clear redo stack
+    History --> Service : void
+    deactivate History
+    
+    Service -> Audit : logAction(DEPOSIT, TRANSACTION, transactionId)
+    
+    Service --> Controller : Transaction (SUCCESS)
+    deactivate Service
+    
+    Controller --> Browser : 200 OK {success: true, transaction}
+    Browser --> User : Success message with details
+end
+
+@enduml

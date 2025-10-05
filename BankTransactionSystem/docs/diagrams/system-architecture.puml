@@ -1,0 +1,211 @@
+@startuml Banking System - System Architecture
+
+title Banking System - System Architecture Diagram
+
+!define RECTANGLE class
+
+' ============= PRESENTATION LAYER =============
+
+package "Presentation Layer" {
+    [Web Browser] as browser
+    [HTML Pages] as html
+    [JavaScript Client] as js
+    [CSS Styling] as css
+    
+    browser --> html
+    browser --> js
+    browser --> css
+}
+
+' ============= API LAYER =============
+
+package "API Layer (Spring Boot)" {
+    [Customer Controller] as customerCtrl
+    [Account Controller] as accountCtrl
+    [Transaction Controller] as txnCtrl
+    [Transaction History Controller] as historyCtrl
+    [Audit Log Controller] as auditCtrl
+    [Settlement Controller] as settlementCtrl
+    
+    note right of customerCtrl
+      REST endpoints:
+      - POST /register
+      - POST /login
+      - PUT /change-password
+    end note
+}
+
+' ============= SERVICE LAYER =============
+
+package "Service Layer (Business Logic)" {
+    [Customer Service] as customerSvc
+    [Account Service] as accountSvc
+    [Transaction Service] as txnSvc
+    [Audit Log Service] as auditSvc
+    [Settlement Service] as settlementSvc
+    
+    note right of txnSvc
+      Core banking operations:
+      - Deposit/Withdraw/Transfer
+      - Transaction limits validation
+      - Undo/Redo functionality
+      - Daily settlement
+    end note
+}
+
+' ============= DATA STRUCTURES =============
+
+package "Custom Data Structures" {
+    [Transaction Queue] as queue
+    [Transaction Stack] as stack
+    [Transaction History] as history
+    
+    note right of history
+      Implements Command Pattern:
+      - Undo Stack (LIFO)
+      - Redo Stack (LIFO)
+      - Reversible operations
+    end note
+}
+
+' ============= REPOSITORY LAYER =============
+
+package "Repository Layer (Data Access)" {
+    [Customer Repository] as customerRepo
+    [Account Repository] as accountRepo
+    [Transaction Repository] as txnRepo
+    [Audit Log Repository] as auditRepo
+}
+
+' ============= DATABASE LAYER =============
+
+database "MongoDB" {
+    [customers] as customerDB
+    [accounts] as accountDB
+    [transactions] as txnDB
+    [audit_logs] as auditDB
+}
+
+' ============= UTILITIES =============
+
+package "Utilities & Configuration" {
+    [Logging Util] as logging
+    [Security Config] as security
+    [Web Config (CORS)] as webConfig
+    [Mongo Config] as mongoConfig
+}
+
+' ============= RELATIONSHIPS =============
+
+' Presentation to API
+js --> customerCtrl : HTTP/REST
+js --> accountCtrl : HTTP/REST
+js --> txnCtrl : HTTP/REST
+js --> historyCtrl : HTTP/REST
+js --> auditCtrl : HTTP/REST
+
+' API to Service
+customerCtrl --> customerSvc
+accountCtrl --> accountSvc
+txnCtrl --> txnSvc
+historyCtrl --> txnSvc
+auditCtrl --> auditSvc
+settlementCtrl --> settlementSvc
+
+' Service to Service
+customerSvc --> auditSvc
+accountSvc --> customerSvc
+accountSvc --> txnSvc
+accountSvc --> auditSvc
+txnSvc --> accountSvc
+txnSvc --> customerSvc
+txnSvc --> auditSvc
+settlementSvc --> auditSvc
+
+' Service to Data Structures
+txnSvc --> queue : FIFO pending
+txnSvc --> stack : LIFO recent
+txnSvc --> history : Undo/Redo
+
+' Service to Repository
+customerSvc --> customerRepo
+accountSvc --> accountRepo
+txnSvc --> txnRepo
+auditSvc --> auditRepo
+settlementSvc --> txnRepo
+
+' Repository to Database
+customerRepo --> customerDB
+accountRepo --> accountDB
+txnRepo --> txnDB
+auditRepo --> auditDB
+
+' Utilities
+logging ..> txnSvc : logs
+logging ..> auditSvc : logs
+security ..> customerCtrl : secures
+webConfig ..> customerCtrl : CORS
+mongoConfig ..> customerRepo : configures
+
+' ============= NOTES =============
+
+note as architecture_notes
+**Architecture Highlights:**
+
+**Layered Architecture:**
+- Presentation Layer: HTML/CSS/JavaScript
+- API Layer: REST Controllers
+- Service Layer: Business Logic
+- Repository Layer: Data Access
+- Database Layer: MongoDB
+
+**Design Patterns:**
+- MVC (Model-View-Controller)
+- Repository Pattern
+- Command Pattern (Undo/Redo)
+- Dependency Injection
+- Service Layer Pattern
+
+**Key Features:**
+- RESTful API design
+- CORS enabled for cross-origin
+- MongoDB for NoSQL storage
+- Custom data structures (Queue, Stack)
+- Comprehensive audit logging
+- Transaction undo/redo capability
+- Automated settlement jobs
+end note
+
+note as data_flow
+**Data Flow:**
+
+1. User Action → Browser
+2. Browser → JavaScript Client
+3. JavaScript → REST API (JSON)
+4. Controller → Service Layer
+5. Service → Repository
+6. Repository → MongoDB
+7. Response flows back up
+
+**Transaction Flow:**
+1. Validate user & account
+2. Check transaction limits
+3. Process transaction
+4. Update balances
+5. Log to audit
+6. Push to queue/stack
+7. Add to undo history
+end note
+
+note as security_note
+**Security Measures:**
+
+- Password hashing
+- Session management
+- CORS configuration
+- Transaction authentication
+- Audit trail for all actions
+- Account closure verification
+end note
+
+@enduml

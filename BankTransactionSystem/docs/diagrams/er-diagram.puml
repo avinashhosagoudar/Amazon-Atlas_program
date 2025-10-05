@@ -1,0 +1,164 @@
+@startuml Banking System - ER Diagram
+
+title Banking System - Entity Relationship Diagram
+
+' ============= ENTITIES =============
+
+entity "Customer" as customer {
+  * **id** : String <<PK>>
+  --
+  * name : String
+  * email : String <<UK>>
+  * password : String
+  * active : Boolean
+  * createdDate : DateTime
+  * lastModifiedDate : DateTime
+}
+
+entity "Account" as account {
+  * **id** : String <<PK>>
+  --
+  * accountNumber : String <<UK>>
+  * customerId : String <<FK>>
+  * accountType : String
+  * balance : Double
+  * active : Boolean
+  * createdDate : DateTime
+  * lastModifiedDate : DateTime
+}
+
+entity "Transaction" as transaction {
+  * **id** : String <<PK>>
+  --
+  * transactionId : String <<UK>>
+  fromAccountNumber : String <<FK>>
+  toAccountNumber : String <<FK>>
+  * amount : Double
+  * transactionType : String
+  * status : String
+  description : String
+  balanceAfter : Double
+  * transactionDate : DateTime
+}
+
+entity "AuditLog" as auditlog {
+  * **id** : String <<PK>>
+  --
+  * userId : String <<FK>>
+  * action : String
+  * entityType : String
+  * entityId : String
+  oldValue : String
+  newValue : String
+  ipAddress : String
+  userAgent : String
+  * timestamp : DateTime
+}
+
+' ============= RELATIONSHIPS =============
+
+customer ||--o{ account : "owns"
+customer ||--o{ auditlog : "generates"
+account ||--o{ transaction : "from/to"
+
+note right of customer
+  Primary user entity
+  - One customer can have multiple accounts
+  - Email is unique identifier
+  - Password is hashed
+  - Active flag for soft delete
+end note
+
+note right of account
+  Banking account entity
+  - Each account belongs to one customer
+  - accountNumber is auto-generated unique ID
+  - accountType: SB (Savings) or CA (Current)
+  - Minimum balance rules apply
+  - Active flag for open/closed status
+end note
+
+note right of transaction
+  Transaction record entity
+  - Supports DEPOSIT, WITHDRAW, TRANSFER
+  - Status: SUCCESS, FAILED, PENDING
+  - fromAccountNumber: source (null for deposits)
+  - toAccountNumber: destination (null for withdrawals)
+  - Immutable once created
+  - Used for undo/redo operations
+end note
+
+note right of auditlog
+  Audit trail entity
+  - Tracks all system actions
+  - userId: who performed action
+  - action: LOGIN, DEPOSIT, WITHDRAW, etc.
+  - entityType: CUSTOMER, ACCOUNT, TRANSACTION
+  - Supports compliance and monitoring
+  - Immutable records
+end note
+
+' ============= CONSTRAINTS =============
+
+note as constraints
+**Database Constraints:**
+
+**Customer:**
+- email must be unique
+- password must be non-null
+- active defaults to true
+
+**Account:**
+- accountNumber must be unique
+- customerId must reference valid Customer
+- accountType must be 'SB' or 'CA'
+- balance >= minimum (1000 for SB, 5000 for CA)
+- One customer can have max 1 SB and 1 CA account
+
+**Transaction:**
+- transactionId must be unique
+- amount must be > 0
+- transactionType must be in (DEPOSIT, WITHDRAW, TRANSFER)
+- status must be in (SUCCESS, FAILED, PENDING)
+- For DEPOSIT: fromAccountNumber is null
+- For WITHDRAW: toAccountNumber is null
+- For TRANSFER: both accounts must be valid
+
+**AuditLog:**
+- userId must reference valid Customer
+- timestamp is auto-generated
+- All logs are immutable
+end note
+
+' ============= INDEXES =============
+
+note as indexes
+**Database Indexes:**
+
+**Customer:**
+- PRIMARY: id
+- UNIQUE: email
+- INDEX: active, createdDate
+
+**Account:**
+- PRIMARY: id
+- UNIQUE: accountNumber
+- INDEX: customerId, accountType
+- COMPOSITE: (customerId, accountType, active)
+
+**Transaction:**
+- PRIMARY: id
+- UNIQUE: transactionId
+- INDEX: fromAccountNumber, toAccountNumber
+- INDEX: status, transactionDate
+- COMPOSITE: (fromAccountNumber, status, transactionDate)
+- COMPOSITE: (toAccountNumber, status, transactionDate)
+
+**AuditLog:**
+- PRIMARY: id
+- INDEX: userId, action, timestamp
+- INDEX: entityType, entityId
+- COMPOSITE: (userId, timestamp)
+end note
+
+@enduml

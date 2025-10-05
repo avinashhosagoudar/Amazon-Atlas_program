@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Close Account</title>
+    <link rel="stylesheet" href="../css/style.css?v=6">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Close Account</h1>
+            <button class="back-btn" onclick="location.href='customer-dashboard.html'">← Back to Dashboard</button>
+        </div>
+
+        <div class="content">
+            <div class="warning-box" style="background: #fff3e0; border: 2px solid #ff9800; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #e65100; margin-top: 0;">⚠️ Important Information</h3>
+                <ul style="color: #333; margin: 10px 0;">
+                    <li><strong>Automatic Withdrawal:</strong> If your account has a balance, all funds will be automatically withdrawn before closing.</li>
+                    <li><strong>Password Required:</strong> You must enter your password to confirm account closure.</li>
+                    <li><strong>Cannot be Undone:</strong> Once closed, the account cannot be reopened.</li>
+                </ul>
+            </div>
+            
+            <div id="accountsList" class="accounts-list"></div>
+            
+            <!-- Confirmation Modal -->
+            <div id="confirmationModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; box-shadow: 0 10px 50px rgba(0,0,0,0.3);">
+                    <h2 style="color: #e65100; margin-top: 0;">🏦 Close Account Confirmation</h2>
+                    
+                    <div id="accountDetails" style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;"></div>
+                    
+                    <div id="balanceWarning" style="display: none; background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0;">
+                        <strong style="color: #e65100;">💰 Automatic Withdrawal</strong>
+                        <p style="margin: 10px 0; color: #333;" id="withdrawalInfo"></p>
+                    </div>
+                    
+                    <div class="form-group" style="background: #fff3e0; padding: 15px; border-radius: 8px; border: 2px solid #ff9800; margin-top: 20px;">
+                        <label for="confirmPassword" style="color: #e65100; font-weight: bold; font-size: 1.1em;">
+                            🔒 Enter your password to confirm:
+                        </label>
+                        <input type="password" id="confirmPassword" 
+                               required placeholder="Enter your password" 
+                               autocomplete="current-password"
+                               style="width: 100%; margin-top: 10px; border: 2px solid #ff9800; font-size: 1em; padding: 12px; border-radius: 5px;">
+                        <small style="color: #e65100; font-size: 0.9em; display: block; margin-top: 8px; font-weight: 600;">
+                            ⚠️ Password is required to close the account
+                        </small>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="confirmClose()" class="submit-btn" style="flex: 1; background: #d32f2f;">
+                            Close Account
+                        </button>
+                        <button onclick="cancelClose()" class="submit-btn" style="flex: 1; background: #757575;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script src="../js/main.js?v=6"></script>
+    <script src="../js/close-account.js?v=6"></script>
+</body>
+</html>

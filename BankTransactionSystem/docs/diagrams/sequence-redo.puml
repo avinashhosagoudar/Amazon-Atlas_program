@@ -1,0 +1,110 @@
+@startuml Redo Transaction - Sequence Diagram
+
+title Redo Transaction Flow
+
+actor User
+participant "Browser" as Browser
+participant "TransactionHistoryController" as Controller
+participant "TransactionService" as Service
+participant "TransactionHistory" as History
+participant "AccountService" as AcctService
+participant "AuditLogService" as Audit
+participant "MongoDB" as DB
+
+User -> Browser : Click Redo Transaction
+Browser -> Controller : POST /api/transaction-history/redo
+
+activate Controller
+Controller -> Service : redoLastTransaction()
+
+activate Service
+Service -> History : popFromRedoStack()
+activate History
+
+alt No Transaction to Redo
+    History --> Service : null
+    Service --> Controller : throw IllegalStateException\n("No transaction to redo")
+    Controller --> Browser : 400 Bad Request
+    Browser --> User : No transaction available
+else Transaction Available
+    History -> History : Remove last transaction from redo stack
+    History -> History : Add transaction to undo stack
+    History --> Service : Transaction to redo
+    deactivate History
+    
+    Service -> Service : Identify transaction type
+    
+    alt Transaction Type: DEPOSIT
+        Service -> Service : redoDeposit(transaction)
+        activate Service
+        Service -> AcctService : getAccountByNumber(toAccountNumber)
+        AcctService --> Service : Account
+        
+        Service -> Service : Calculate: newBalance = balance + amount
+        Service -> AcctService : updateBalance(accountNumber, newBalance)
+        AcctService --> Service : Updated account
+        
+        Service -> Service : Create redo transaction\n(type: DEPOSIT, status: SUCCESS)
+        Service -> DB : save(redoTransaction)
+        deactivate Service
+        
+    else Transaction Type: WITHDRAW
+        Service -> Service : redoWithdrawal(transaction)
+        activate Service
+        Service -> AcctService : getAccountByNumber(fromAccountNumber)
+        AcctService --> Service : Account
+        
+        Service -> Service : Validate: balance >= amount + minBalance
+        Service -> Service : Calculate: newBalance = balance - amount
+        Service -> AcctService : updateBalance(accountNumber, newBalance)
+        AcctService --> Service : Updated account
+        
+        Service -> Service : Create redo transaction\n(type: WITHDRAW, status: SUCCESS)
+        Service -> DB : save(redoTransaction)
+        deactivate Service
+        
+    else Transaction Type: TRANSFER
+        Service -> Service : redoTransfer(transaction)
+        activate Service
+        Service -> AcctService : getAccountByNumber(fromAccountNumber)
+        AcctService --> Service : From Account
+        Service -> AcctService : getAccountByNumber(toAccountNumber)
+        AcctService --> Service : To Account
+        
+        Service -> Service : Validate source account balance
+        
+        Service -> Service : Transfer amount:\nfrom 'from account' to 'to account'
+        
+        Service -> AcctService : updateBalance(fromAccount, balance - amount)
+        AcctService --> Service : Updated from account
+        
+        Service -> AcctService : updateBalance(toAccount, balance + amount)
+        AcctService --> Service : Updated to account
+        
+        Service -> Service : Create redo transaction\n(type: TRANSFER, status: SUCCESS)
+        Service -> DB : save(redoTransaction)
+        deactivate Service
+    end
+    
+    ' Audit logging
+    Service -> Audit : logAction(TRANSACTION_REDO, TRANSACTION,\ntransactionId)
+    
+    Service --> Controller : true (success)
+    deactivate Service
+    
+    Controller --> Browser : 200 OK {success: true, message}
+    Browser --> User : Transaction redone successfully
+end
+
+note right of Service
+  Redo Process:
+  1. Pop transaction from redo stack
+  2. Re-execute the transaction
+  3. Validate all conditions again
+  4. Update account balances
+  5. Create new transaction record
+  6. Push to undo stack
+  7. Log audit trail
+end note
+
+@enduml

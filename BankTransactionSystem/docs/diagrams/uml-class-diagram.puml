@@ -1,0 +1,647 @@
+@startuml Banking System - Complete Class Diagram
+
+title Banking System - Detailed UML Class Diagram
+
+' ============= MODEL LAYER =============
+
+package "Model Layer" {
+    
+    class Customer {
+        - String id
+        - String name
+        - String email
+        - String password
+        - boolean active
+        - LocalDateTime createdDate
+        - LocalDateTime lastModifiedDate
+        __
+        + Customer()
+        + Customer(name: String, email: String, password: String)
+        __
+        + getId(): String
+        + setId(id: String): void
+        + getName(): String
+        + setName(name: String): void
+        + getEmail(): String
+        + setEmail(email: String): void
+        + getPassword(): String
+        + setPassword(password: String): void
+        + isActive(): boolean
+        + setActive(active: boolean): void
+        + getCreatedDate(): LocalDateTime
+        + getLastModifiedDate(): LocalDateTime
+        + toString(): String
+    }
+    
+    class Account {
+        - String id
+        - String accountNumber
+        - String customerId
+        - String accountType
+        - double balance
+        - boolean active
+        - LocalDateTime createdDate
+        - LocalDateTime lastModifiedDate
+        __
+        + Account()
+        + Account(customerId: String, accountType: String, initialBalance: double)
+        __
+        - generateAccountNumber(): String
+        __
+        + getId(): String
+        + setId(id: String): void
+        + getAccountNumber(): String
+        + setAccountNumber(accountNumber: String): void
+        + getCustomerId(): String
+        + setCustomerId(customerId: String): void
+        + getAccountType(): String
+        + setAccountType(accountType: String): void
+        + getBalance(): double
+        + setBalance(balance: double): void
+        + isActive(): boolean
+        + setActive(active: boolean): void
+        + getCreatedDate(): LocalDateTime
+        + getLastModifiedDate(): LocalDateTime
+        + toString(): String
+    }
+    
+    class Transaction {
+        - String id
+        - String transactionId
+        - String fromAccountNumber
+        - String toAccountNumber
+        - double amount
+        - String transactionType
+        - String status
+        - String description
+        - double balanceAfter
+        - LocalDateTime transactionDate
+        __
+        + Transaction()
+        + Transaction(fromAccountNumber: String, toAccountNumber: String, amount: double, transactionType: String, description: String)
+        __
+        - generateTransactionId(): String
+        __
+        + getId(): String
+        + setId(id: String): void
+        + getTransactionId(): String
+        + setTransactionId(transactionId: String): void
+        + getFromAccountNumber(): String
+        + setFromAccountNumber(fromAccountNumber: String): void
+        + getToAccountNumber(): String
+        + setToAccountNumber(toAccountNumber: String): void
+        + getAmount(): double
+        + setAmount(amount: double): void
+        + getTransactionType(): String
+        + setTransactionType(transactionType: String): void
+        + getStatus(): String
+        + setStatus(status: String): void
+        + getDescription(): String
+        + setDescription(description: String): void
+        + getBalanceAfter(): double
+        + setBalanceAfter(balanceAfter: double): void
+        + getTransactionDate(): LocalDateTime
+        + setTransactionDate(transactionDate: LocalDateTime): void
+        + toString(): String
+    }
+    
+    class AuditLog {
+        - String id
+        - String userId
+        - String action
+        - String entityType
+        - String entityId
+        - String oldValue
+        - String newValue
+        - String ipAddress
+        - String userAgent
+        - LocalDateTime timestamp
+        __
+        + AuditLog()
+        + AuditLog(userId: String, action: String, entityType: String, entityId: String)
+        __
+        + getId(): String
+        + setId(id: String): void
+        + getUserId(): String
+        + setUserId(userId: String): void
+        + getAction(): String
+        + setAction(action: String): void
+        + getEntityType(): String
+        + setEntityType(entityType: String): void
+        + getEntityId(): String
+        + setEntityId(entityId: String): void
+        + getOldValue(): String
+        + setOldValue(oldValue: String): void
+        + getNewValue(): String
+        + setNewValue(newValue: String): void
+        + getIpAddress(): String
+        + setIpAddress(ipAddress: String): void
+        + getUserAgent(): String
+        + setUserAgent(userAgent: String): void
+        + getTimestamp(): LocalDateTime
+        + setTimestamp(timestamp: LocalDateTime): void
+        + toString(): String
+    }
+}
+
+package "Custom Data Structures" {
+    
+    class TransactionQueue {
+        - List<Transaction> queue
+        - int maxSize
+        - int front
+        - int rear
+        __
+        + TransactionQueue()
+        + TransactionQueue(maxSize: int)
+        __
+        + enqueue(transaction: Transaction): boolean
+        + dequeue(): Transaction
+        + peek(): Transaction
+        + isEmpty(): boolean
+        + size(): int
+        + isFull(): boolean
+        + clear(): void
+        + getAllTransactions(): List<Transaction>
+        + search(transactionId: String): int
+        + getAt(position: int): Transaction
+        + toString(): String
+    }
+    
+    class TransactionStack {
+        - List<Transaction> stack
+        - int maxSize
+        __
+        + TransactionStack()
+        + TransactionStack(maxSize: int)
+        __
+        + push(transaction: Transaction): boolean
+        + pop(): Transaction
+        + peek(): Transaction
+        + isEmpty(): boolean
+        + size(): int
+        + isFull(): boolean
+        + clear(): void
+        + getAllTransactions(): List<Transaction>
+        + search(transactionId: String): int
+        + toString(): String
+    }
+    
+    class TransactionHistory {
+        - List<Transaction> undoStack
+        - List<Transaction> redoStack
+        - int maxSize
+        __
+        + TransactionHistory()
+        __
+        + pushToUndoStack(transaction: Transaction): void
+        + popFromUndoStack(): Transaction
+        + popFromRedoStack(): Transaction
+        + peekUndoStack(): Transaction
+        + peekRedoStack(): Transaction
+        + canUndo(): boolean
+        + canRedo(): boolean
+        + getUndoStackSize(): int
+        + getRedoStackSize(): int
+        + getUndoableTransactions(): List<Transaction>
+        + getRedoableTransactions(): List<Transaction>
+        + clear(): void
+        + clearRedoStack(): void
+        + toString(): String
+    }
+}
+
+' ============= REPOSITORY LAYER =============
+
+package "Repository Layer" {
+    
+    interface CustomerRepository {
+        + findByEmail(email: String): Optional<Customer>
+        + findByEmailAndPassword(email: String, password: String): Optional<Customer>
+        + findActiveCustomers(): List<Customer>
+        + findByNameContainingIgnoreCase(name: String): List<Customer>
+        + existsByEmail(email: String): boolean
+        + findCustomersCreatedAfter(date: LocalDateTime): List<Customer>
+        + countActiveCustomers(): long
+    }
+    
+    interface AccountRepository {
+        + findByAccountNumber(accountNumber: String): Optional<Account>
+        + findByCustomerId(customerId: String): List<Account>
+        + findActiveAccountsByCustomerId(customerId: String): List<Account>
+        + findByAccountType(accountType: String): List<Account>
+        + findByCustomerIdAndAccountType(customerId: String, accountType: String): List<Account>
+        + findActiveAccountsByCustomerIdAndAccountType(customerId: String, accountType: String): List<Account>
+        + findAccountsWithBalanceGreaterThan(amount: double): List<Account>
+        + findAccountsWithBalanceLessThan(amount: double): List<Account>
+        + existsByAccountNumber(accountNumber: String): boolean
+        + countByCustomerId(customerId: String): long
+        + findAllActiveAccounts(): List<Account>
+        + findAccountsForTotalBalance(customerId: String): List<Account>
+    }
+    
+    interface TransactionRepository {
+        + findByTransactionId(transactionId: String): Optional<Transaction>
+        + findByFromAccountNumber(accountNumber: String, sort: Sort): List<Transaction>
+        + findByToAccountNumber(accountNumber: String, sort: Sort): List<Transaction>
+        + findByAccountNumber(accountNumber: String, sort: Sort): List<Transaction>
+        + findByTransactionType(transactionType: String, sort: Sort): List<Transaction>
+        + findByStatus(status: String, sort: Sort): List<Transaction>
+        + findByTransactionDateBetween(startDate: LocalDateTime, endDate: LocalDateTime, sort: Sort): List<Transaction>
+        + findByAccountNumberAndDateRange(accountNumber: String, startDate: LocalDateTime, endDate: LocalDateTime, sort: Sort): List<Transaction>
+        + findSuccessfulTransactions(sort: Sort): List<Transaction>
+        + findFailedTransactions(sort: Sort): List<Transaction>
+        + findPendingTransactions(): List<Transaction>
+        + countByStatus(status: String): long
+        + findByAmountBetween(minAmount: double, maxAmount: double, sort: Sort): List<Transaction>
+        + findRecentTransactionsByAccountNumber(accountNumber: String, sort: Sort): List<Transaction>
+        + findSuccessfulTransactionsForSettlement(startDate: LocalDateTime, endDate: LocalDateTime): List<Transaction>
+        + findSuccessfulTransactionsByAccountNumberAndDateRange(accountNumber: String, startDate: LocalDateTime, endDate: LocalDateTime): List<Transaction>
+        + findSuccessfulDebitTransactionsByAccountNumberAndDateRange(accountNumber: String, startDate: LocalDateTime, endDate: LocalDateTime): List<Transaction>
+    }
+    
+    interface AuditLogRepository {
+        + findByUserId(userId: String, sort: Sort): List<AuditLog>
+        + findByAction(action: String, sort: Sort): List<AuditLog>
+        + findByEntityType(entityType: String, sort: Sort): List<AuditLog>
+        + findByEntityId(entityId: String, sort: Sort): List<AuditLog>
+        + findByTimestampBetween(startDate: LocalDateTime, endDate: LocalDateTime, sort: Sort): List<AuditLog>
+        + findByUserIdAndAction(userId: String, action: String, sort: Sort): List<AuditLog>
+        + findByUserIdAndTimestampBetween(userId: String, startDate: LocalDateTime, endDate: LocalDateTime, sort: Sort): List<AuditLog>
+        + findByIpAddress(ipAddress: String, sort: Sort): List<AuditLog>
+        + findRecentLogs(since: LocalDateTime, sort: Sort): List<AuditLog>
+        + countByAction(action: String): long
+        + countByUserId(userId: String): long
+        + findSecurityLogs(sort: Sort): List<AuditLog>
+        + findTransactionLogs(sort: Sort): List<AuditLog>
+        + findComplianceLogs(actions: List<String>, startDate: LocalDateTime, endDate: LocalDateTime, sort: Sort): List<AuditLog>
+    }
+}
+
+' ============= SERVICE LAYER =============
+
+package "Service Layer" {
+    
+    class CustomerService {
+        - CustomerRepository customerRepository
+        - AuditLogService auditLogService
+        __
+        + registerCustomer(name: String, email: String, password: String): Customer
+        + loginCustomer(email: String, password: String): Customer
+        + getCustomerById(customerId: String): Customer
+        + changePassword(customerId: String, oldPassword: String, newPassword: String): boolean
+        + verifyCustomerPassword(customerId: String, password: String): boolean
+        + updateCustomer(customer: Customer): Customer
+        + deactivateCustomer(customerId: String): boolean
+    }
+    
+    class AccountService {
+        - AccountRepository accountRepository
+        - CustomerService customerService
+        - AuditLogService auditLogService
+        - TransactionService transactionService
+        __
+        + createAccount(customerId: String, accountType: String, initialDeposit: double): Account
+        + getAccountByNumber(accountNumber: String): Account
+        + getAccountsByCustomerId(customerId: String): List<Account>
+        + updateBalance(accountNumber: String, newBalance: double): Account
+        + validateAccountForTransaction(accountNumber: String, amount: double, transactionType: String): boolean
+        + closeAccount(accountNumber: String, customerId: String, password: String): Map<String, Object>
+        + getAccountCountByCustomer(customerId: String): long
+        + getTotalBalanceForCustomer(customerId: String): double
+    }
+    
+    class TransactionService {
+        - TransactionRepository transactionRepository
+        - AccountService accountService
+        - CustomerService customerService
+        - AuditLogService auditLogService
+        - TransactionQueue transactionQueue
+        - TransactionStack transactionStack
+        - TransactionHistory transactionHistory
+        __
+        {static} - double SB_MIN_TRANSACTION_AMOUNT
+        {static} - double SB_MAX_TRANSACTION_AMOUNT
+        {static} - double SB_DAILY_LIMIT
+        {static} - double CA_MIN_TRANSACTION_AMOUNT
+        {static} - double CA_MAX_TRANSACTION_AMOUNT
+        {static} - double CA_DAILY_LIMIT
+        __
+        - validateTransactionLimits(accountNumber: String, amount: double, transactionType: String): void
+        - calculateTodayDebitTotal(accountNumber: String): double
+        + getTransactionLimits(accountType: String): String
+        + depositMoney(accountNumber: String, amount: double): Transaction
+        + withdrawMoney(accountNumber: String, amount: double): boolean
+        + withdrawMoneyWithTransaction(accountNumber: String, amount: double, password: String): Transaction
+        + withdrawForAccountClosure(accountNumber: String, customerId: String, password: String): Transaction
+        + transferMoney(fromAccountNumber: String, toAccountNumber: String, amount: double, password: String): Transaction
+        - transferMoneyInternal(fromAccountNumber: String, toAccountNumber: String, amount: double): Transaction
+        + undoLastTransaction(): boolean
+        + redoLastTransaction(): boolean
+        - reverseDeposit(originalTransaction: Transaction): void
+        - reverseWithdrawal(originalTransaction: Transaction): void
+        - reverseTransfer(originalTransaction: Transaction): void
+        - redoDeposit(originalTransaction: Transaction): void
+        - redoWithdrawal(originalTransaction: Transaction): void
+        - redoTransfer(originalTransaction: Transaction): void
+        + getTransactionHistory(accountNumber: String): List<Transaction>
+        + getRecentTransactionsFromStack(): List<Transaction>
+        + getPendingTransactionsFromQueue(): List<Transaction>
+        + processPendingTransactions(): void
+        + getTransactionStatistics(startDate: LocalDateTime, endDate: LocalDateTime): TransactionStatistics
+        - processTransaction(transaction: Transaction): void
+        + canUndo(): boolean
+        + canRedo(): boolean
+        + getUndoableTransactions(): List<Transaction>
+        + getUndoableTransactionsForAccount(accountNumber: String): List<Transaction>
+        + getRedoableTransactions(): List<Transaction>
+        + getRedoableTransactionsForAccount(accountNumber: String): List<Transaction>
+        + undoLastTransactionForAccount(accountNumber: String): boolean
+        + redoLastTransactionForAccount(accountNumber: String): boolean
+        + getTransactionHistorySummary(): TransactionHistorySummary
+    }
+    
+    class AuditLogService {
+        - AuditLogRepository auditLogRepository
+        __
+        + logAction(userId: String, action: String, entityType: String, entityId: String): void
+        + logAction(userId: String, action: String, entityType: String, entityId: String, oldValue: String, newValue: String): void
+        + logAction(userId: String, action: String, entityType: String, entityId: String, oldValue: String, newValue: String, ipAddress: String, userAgent: String): void
+        + getAuditLogsByUserId(userId: String): List<AuditLog>
+        + getAuditLogsByAction(action: String): List<AuditLog>
+        + getAuditLogsByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): List<AuditLog>
+        + getSecurityLogs(): List<AuditLog>
+        + getTransactionLogs(): List<AuditLog>
+        + getRecentAuditLogs(hours: int): List<AuditLog>
+        + getComplianceLogs(actions: List<String>, startDate: LocalDateTime, endDate: LocalDateTime): List<AuditLog>
+        + getAuditStatistics(startDate: LocalDateTime, endDate: LocalDateTime): AuditStatistics
+    }
+    
+    class SettlementService {
+        - TransactionRepository transactionRepository
+        - AuditLogService auditLogService
+        __
+        + performDailySettlement(): SettlementResult
+        + performMonthlySettlement(): SettlementResult
+        + performSettlement(startDate: LocalDateTime, endDate: LocalDateTime, settlementType: String): SettlementResult
+        + getSettlementTransactions(startDate: LocalDateTime, endDate: LocalDateTime): List<Transaction>
+        + reconcilePendingTransactions(): int
+    }
+    
+    class TransactionStatistics {
+        - long totalTransactions
+        - double totalAmount
+        - long depositCount
+        - long withdrawalCount
+        - long transferCount
+        - double depositAmount
+        - double withdrawalAmount
+        - double transferAmount
+        __
+        + TransactionStatistics(...)
+        + getTotalTransactions(): long
+        + getTotalAmount(): double
+        + getDepositCount(): long
+        + getWithdrawalCount(): long
+        + getTransferCount(): long
+        + getDepositAmount(): double
+        + getWithdrawalAmount(): double
+        + getTransferAmount(): double
+    }
+    
+    class TransactionHistorySummary {
+        - int undoStackSize
+        - int redoStackSize
+        - boolean canUndo
+        - boolean canRedo
+        __
+        + getUndoStackSize(): int
+        + getRedoStackSize(): int
+        + isCanUndo(): boolean
+        + isCanRedo(): boolean
+    }
+    
+    class SettlementResult {
+        - String settlementType
+        - LocalDateTime startDate
+        - LocalDateTime endDate
+        - long totalTransactions
+        - double totalAmount
+        - long depositCount
+        - long withdrawalCount
+        - long transferCount
+        - double depositAmount
+        - double withdrawalAmount
+        - double transferAmount
+        - LocalDateTime settlementTime
+        __
+        + SettlementResult(...)
+        + getSettlementType(): String
+        + getStartDate(): LocalDateTime
+        + getEndDate(): LocalDateTime
+        + getTotalTransactions(): long
+        + getTotalAmount(): double
+        + toString(): String
+    }
+    
+    class AuditStatistics {
+        - long totalLogs
+        - long loginAttempts
+        - long transactionLogs
+        - long failedActions
+        __
+        + AuditStatistics(totalLogs: long, loginAttempts: long, transactionLogs: long, failedActions: long)
+        + getTotalLogs(): long
+        + getLoginAttempts(): long
+        + getTransactionLogs(): long
+        + getFailedActions(): long
+    }
+}
+
+' ============= CONTROLLER LAYER =============
+
+package "Controller Layer" {
+    
+    class CustomerController {
+        - CustomerService customerService
+        __
+        + registerCustomer(request: Map): ResponseEntity<?>
+        + loginCustomer(request: Map): ResponseEntity<?>
+        + changePassword(request: Map): ResponseEntity<?>
+    }
+    
+    class AccountController {
+        - AccountService accountService
+        __
+        + createAccount(request: Map): ResponseEntity<?>
+        + getAccountsByCustomer(customerId: String): ResponseEntity<List<Account>>
+        + getAccountByNumber(accountNumber: String): ResponseEntity<?>
+        + closeAccount(request: Map): ResponseEntity<?>
+        + getTotalBalance(customerId: String): ResponseEntity<?>
+    }
+    
+    class TransactionController {
+        - TransactionService transactionService
+        __
+        + depositMoney(request: Map): ResponseEntity<?>
+        + withdrawMoney(request: Map): ResponseEntity<?>
+        + transferMoney(request: Map): ResponseEntity<?>
+        + getTransactionHistory(accountNumber: String): ResponseEntity<List<Transaction>>
+        + getTransactionStatistics(startDate: String, endDate: String): ResponseEntity<?>
+        + getRecentTransactions(): ResponseEntity<List<Transaction>>
+        + getPendingTransactions(): ResponseEntity<List<Transaction>>
+        + processPendingTransactions(): ResponseEntity<?>
+        + getTransactionLimits(accountType: String): ResponseEntity<?>
+    }
+    
+    class TransactionHistoryController {
+        - TransactionService transactionService
+        __
+        + undoLastTransaction(): ResponseEntity<?>
+        + undoLastTransactionForAccount(accountNumber: String): ResponseEntity<?>
+        + redoLastTransaction(): ResponseEntity<?>
+        + redoLastTransactionForAccount(accountNumber: String): ResponseEntity<?>
+        + canUndo(): ResponseEntity<?>
+        + canRedo(): ResponseEntity<?>
+        + getUndoableTransactions(): ResponseEntity<List<Transaction>>
+        + getUndoableTransactionsForAccount(accountNumber: String): ResponseEntity<List<Transaction>>
+        + getRedoableTransactions(): ResponseEntity<List<Transaction>>
+        + getRedoableTransactionsForAccount(accountNumber: String): ResponseEntity<List<Transaction>>
+        + getTransactionHistorySummary(): ResponseEntity<?>
+    }
+    
+    class AuditLogController {
+        - AuditLogService auditLogService
+        __
+        + getAuditLogsByUser(userId: String): ResponseEntity<List<AuditLog>>
+        + getTransactionLogsByUser(userId: String): ResponseEntity<List<AuditLog>>
+        + getSecurityLogsByUser(userId: String): ResponseEntity<List<AuditLog>>
+        + getRecentLogsByUser(userId: String, hours: int): ResponseEntity<List<AuditLog>>
+        + getAuditLogsByAction(action: String): ResponseEntity<List<AuditLog>>
+    }
+    
+    class SettlementController {
+        - SettlementService settlementService
+        __
+        + performDailySettlement(): ResponseEntity<?>
+        + performMonthlySettlement(): ResponseEntity<?>
+        + reconcilePendingTransactions(): ResponseEntity<?>
+        + getSettlementTransactions(startDate: String, endDate: String): ResponseEntity<?>
+    }
+}
+
+' ============= UTILITY LAYER =============
+
+package "Utility Layer" {
+    
+    class LoggingUtil <<utility>> {
+        {static} - Logger transactionLogger
+        {static} - Logger auditLogger
+        {static} - Logger errorLogger
+        {static} - DateTimeFormatter formatter
+        __
+        {static} + logTransaction(transactionId: String, accountNumber: String, transactionType: String, amount: double, status: String): void
+        {static} + logAudit(userId: String, action: String, entityType: String, entityId: String, details: String): void
+        {static} + logSecurity(userId: String, action: String, ipAddress: String, result: String): void
+        {static} + logError(component: String, operation: String, errorMessage: String, e: Exception): void
+        {static} + logPerformance(operation: String, executionTime: long, details: String): void
+        {static} + logSystem(event: String, details: String): void
+        {static} + logDatabase(operation: String, collection: String, query: String, executionTime: long): void
+        {static} + logBusiness(event: String, entityType: String, entityId: String, details: String): void
+    }
+}
+
+' ============= CONFIGURATION LAYER =============
+
+package "Configuration Layer" {
+    
+    class MongoConfig {
+        __
+        # getDatabaseName(): String
+        + mongoTemplate(): MongoTemplate
+        + mongoMappingContext(): MongoMappingContext
+    }
+    
+    class SecurityConfig {
+        __
+        + securityFilterChain(http: HttpSecurity): SecurityFilterChain
+    }
+    
+    class WebConfig {
+        __
+        + addCorsMappings(registry: CorsRegistry): void
+    }
+}
+
+' ============= RELATIONSHIPS =============
+
+' Model relationships
+Customer "1" -- "0..*" Account : has
+Account "1" -- "0..*" Transaction : involved in
+Customer "1" -- "0..*" AuditLog : tracked by
+
+' Service layer dependencies
+CustomerService --> CustomerRepository
+CustomerService --> AuditLogService
+AccountService --> AccountRepository
+AccountService --> CustomerService
+AccountService --> AuditLogService
+AccountService --> TransactionService
+TransactionService --> TransactionRepository
+TransactionService --> AccountService
+TransactionService --> CustomerService
+TransactionService --> AuditLogService
+TransactionService --> TransactionQueue
+TransactionService --> TransactionStack
+TransactionService --> TransactionHistory
+AuditLogService --> AuditLogRepository
+SettlementService --> TransactionRepository
+SettlementService --> AuditLogService
+
+' Controller layer dependencies
+CustomerController --> CustomerService
+AccountController --> AccountService
+TransactionController --> TransactionService
+TransactionHistoryController --> TransactionService
+AuditLogController --> AuditLogService
+SettlementController --> SettlementService
+
+' Data structures
+TransactionQueue o-- Transaction
+TransactionStack o-- Transaction
+TransactionHistory o-- Transaction
+
+' Inner classes
+TransactionService +-- TransactionStatistics
+TransactionService +-- TransactionHistorySummary
+SettlementService +-- SettlementResult
+AuditLogService +-- AuditStatistics
+
+' Repository inheritance
+CustomerRepository --|> MongoRepository
+AccountRepository --|> MongoRepository
+TransactionRepository --|> MongoRepository
+AuditLogRepository --|> MongoRepository
+
+note right of TransactionService
+  Core business logic for:
+  - Money transfers
+  - Transaction validation
+  - Undo/Redo operations
+  - Daily/monthly limits
+  - ACID compliance
+end note
+
+note right of TransactionHistory
+  Implements Command Pattern
+  for Undo/Redo functionality
+  using dual stack approach
+end note
+
+note right of AuditLogService
+  Comprehensive audit trail
+  for compliance and security
+  monitoring
+end note
+
+@enduml

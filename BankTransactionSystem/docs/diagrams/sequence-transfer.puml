@@ -1,0 +1,127 @@
+@startuml Transfer Money - Sequence Diagram
+
+title Transfer Money Transaction Flow
+
+actor User
+participant "Browser" as Browser
+participant "TransactionController" as Controller
+participant "TransactionService" as Service
+participant "AccountService" as AcctService
+participant "CustomerService" as CustService
+participant "TransactionQueue" as Queue
+participant "TransactionStack" as Stack
+participant "TransactionHistory" as History
+participant "AuditLogService" as Audit
+participant "MongoDB" as DB
+
+User -> Browser : Enter transfer details\n(to account, amount, password)
+Browser -> Controller : POST /api/transactions/transfer\n{fromAccountNumber, toAccountNumber, amount, password}
+
+activate Controller
+Controller -> Service : transferMoney(fromAccount, toAccount, amount, password)
+
+activate Service
+
+' Get source account
+Service -> AcctService : getAccountByNumber(fromAccountNumber)
+activate AcctService
+AcctService -> DB : findByAccountNumber()
+DB --> AcctService : From Account
+AcctService --> Service : From Account
+deactivate AcctService
+
+' Get destination account
+Service -> AcctService : getAccountByNumber(toAccountNumber)
+activate AcctService
+AcctService -> DB : findByAccountNumber()
+DB --> AcctService : To Account
+AcctService --> Service : To Account
+deactivate AcctService
+
+' Verify password
+Service -> CustService : verifyCustomerPassword(customerId, password)
+activate CustService
+CustService -> DB : findByEmailAndPassword()
+alt Password Incorrect
+    DB --> CustService : null
+    CustService -> Audit : logAction(FAILED_TRANSFER_AUTH)
+    CustService --> Service : false
+    Service --> Controller : throw IllegalArgumentException
+    Controller --> Browser : 400 Bad Request
+    Browser --> User : Incorrect password
+else Password Correct
+    DB --> CustService : Customer
+    CustService --> Service : true
+    deactivate CustService
+    
+    ' Validate transaction
+    Service -> Service : Validate amount > 0
+    Service -> Service : Check same account
+    Service -> Service : validateTransactionLimits()
+    Service -> AcctService : validateAccountForTransaction()
+    activate AcctService
+    AcctService -> AcctService : Check sufficient balance
+    AcctService -> AcctService : Check minimum balance after transfer
+    AcctService --> Service : true/false
+    deactivate AcctService
+    
+    alt Validation Fails
+        Service --> Controller : throw IllegalArgumentException
+        Controller --> Browser : 400 Bad Request
+        Browser --> User : Validation error
+    else Validation Succeeds
+        ' Create transaction
+        Service -> Service : Create Transaction object\n(status: PENDING)
+        Service -> Queue : enqueue(transaction)
+        activate Queue
+        Queue --> Service : true
+        deactivate Queue
+        
+        ' Update source account balance
+        Service -> AcctService : updateBalance(fromAccount, balance - amount)
+        activate AcctService
+        AcctService -> DB : save(fromAccount)
+        DB --> AcctService : Updated account
+        AcctService -> Audit : logAction(BALANCE_UPDATE)
+        AcctService --> Service : Updated from account
+        deactivate AcctService
+        
+        ' Update destination account balance
+        Service -> AcctService : updateBalance(toAccount, balance + amount)
+        activate AcctService
+        AcctService -> DB : save(toAccount)
+        DB --> AcctService : Updated account
+        AcctService -> Audit : logAction(BALANCE_UPDATE)
+        AcctService --> Service : Updated to account
+        deactivate AcctService
+        
+        ' Save transaction
+        Service -> Service : Update transaction status: SUCCESS
+        Service -> DB : save(transaction)
+        DB --> Service : Saved transaction
+        
+        ' Update data structures
+        Service -> Stack : push(transaction)
+        activate Stack
+        Stack --> Service : true
+        deactivate Stack
+        
+        Service -> History : pushToUndoStack(transaction)
+        activate History
+        History -> History : Clear redo stack
+        History --> Service : void
+        deactivate History
+        
+        ' Audit logging
+        Service -> Audit : logAction(TRANSFER_OUT, TRANSACTION)
+        Service -> Audit : logAction(TRANSFER_IN, TRANSACTION)
+        
+        Service --> Controller : Transaction (SUCCESS)
+        deactivate Service
+        
+        Controller --> Browser : 200 OK {success: true, transaction}
+        Browser --> User : Transfer successful
+    end
+end
+
+@enduml

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Customer Dashboard</h1>
+            <div class="user-info">
+                <span id="welcomeMessage">Welcome, <strong id="customerName"></strong></span>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="dashboard-menu">
+            <h2>Customer Menu</h2>
+            <div class="menu-options">
+                <button class="menu-btn" onclick="location.href='create-account.html'">
+                    <span class="btn-number">1</span>
+                    <span class="btn-text">Create Account</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='view-balance.html'">
+                    <span class="btn-number">2</span>
+                    <span class="btn-text">View Balance</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='deposit.html'">
+                    <span class="btn-number">3</span>
+                    <span class="btn-text">Deposit Money</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='withdraw.html'">
+                    <span class="btn-number">4</span>
+                    <span class="btn-text">Withdraw Money</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='transfer.html'">
+                    <span class="btn-number">5</span>
+                    <span class="btn-text">Transfer Money</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='transaction-history.html'">
+                    <span class="btn-number">6</span>
+                    <span class="btn-text">Transaction History</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='close-account.html'">
+                    <span class="btn-number">7</span>
+                    <span class="btn-text">Close Account</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='change-password.html'">
+                    <span class="btn-number">8</span>
+                    <span class="btn-text">Change Password</span>
+                </button>
+                <button class="menu-btn" onclick="handleUndoLastTransaction()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <span class="btn-number">9</span>
+                    <span class="btn-text">↶ Undo Last Transaction</span>
+                </button>
+                <button class="menu-btn" onclick="handleRedoTransaction()" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <span class="btn-number">10</span>
+                    <span class="btn-text">↷ Redo Transaction</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='undo-redo.html'" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <span class="btn-number">11</span>
+                    <span class="btn-text">📋 View Undo/Redo History</span>
+                </button>
+                <button class="menu-btn" onclick="location.href='audit-logs.html'" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                    <span class="btn-number">12</span>
+                    <span class="btn-text">📊 View Audit Logs</span>
+                </button>
+                <button class="menu-btn exit-btn" onclick="handleLogout()">
+                    <span class="btn-number">13</span>
+                    <span class="btn-text">Exit</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="accountsSummary" class="accounts-summary"></div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

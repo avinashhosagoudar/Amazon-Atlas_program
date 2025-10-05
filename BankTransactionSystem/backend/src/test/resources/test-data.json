@@ -1,0 +1,51 @@
+{
+  "customers": [
+    {
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "password": "password123",
+      "active": true
+    },
+    {
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "password": "password456",
+      "active": true
+    }
+  ],
+  "accounts": [
+    {
+      "accountNumber": "1234567890123",
+      "customerId": "customer1",
+      "accountType": "SB",
+      "balance": 10000.0,
+      "active": true
+    },
+    {
+      "accountNumber": "9876543210987",
+      "customerId": "customer2",
+      "accountType": "CA",
+      "balance": 25000.0,
+      "active": true
+    }
+  ],
+  "transactions": [
+    {
+      "transactionId": "TXN001",
+      "fromAccountNumber": "1234567890123",
+      "toAccountNumber": "9876543210987",
+      "amount": 1000.0,
+      "transactionType": "TRANSFER",
+      "status": "SUCCESS",
+      "description": "Test transfer"
+    },
+    {
+      "transactionId": "TXN002",
+      "toAccountNumber": "1234567890123",
+      "amount": 500.0,
+      "transactionType": "DEPOSIT",
+      "status": "SUCCESS",
+      "description": "Test deposit"
+    }
+  ]
+}
